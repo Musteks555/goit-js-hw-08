@@ -71,20 +71,24 @@ gallery.addEventListener("click", modalShow);
 let instance;
 
 function modalShow(event) {
-    if (event.target === event.currentTarget) {
-        return;
-    }
-
     event.preventDefault();
 
     const link = event.target;
 
-    instance = basicLightbox.create(`
-        <img src="${link.dataset.source}" alt="${link.alt}">
-    `);
-    instance.show();
+    if (link.tagName !== "IMG") {
+        return;
+    }
 
-    document.addEventListener("keydown", checkEsc);
+    instance = basicLightbox.create(`<img src="${link.dataset.source}" alt="${link.alt}">`, {
+        onShow: () => {
+            document.addEventListener("keydown", checkEsc);
+        },
+        onClose: () => {
+            document.removeEventListener("keydown", checkEsc);
+        },
+    });
+
+    instance.show();
 }
 
 function checkEsc(event) {
